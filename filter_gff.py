@@ -8,10 +8,13 @@ def gff_filter(gff_file, overview_file, output_file):
     f.close()
 
 
-    ref_id =[]
+    ref_id ={}
     for raw_ref in raw_refs[1:]:
         id = raw_ref.split()[0]
-        ref_id.append(id)
+        HMMER = raw_ref.split()[1]
+        Hotpep = raw_ref.split()[2]
+        DIAMOND = raw_ref.split()[3]
+        ref_id[id] = {'HMMER': HMMER, 'Hotpep': Hotpep, 'DIAMOND':DIAMOND}
 
 
     result = []
@@ -25,9 +28,11 @@ def gff_filter(gff_file, overview_file, output_file):
             id = des.split(';partial')[0]
             id_suffix = id.split('_')[1]
             new_id = columns[0] + '_' + id_suffix
-            output_id = 'ID='+new_id
-            if new_id in ref_id:
+
+            if new_id in ref_id.keys():
                 print(new_id)
+                reference = ref_id[new_id]
+                output_id = 'ID='+new_id +'|HMMER='+reference['HMMER'] +'|Hotpep='+reference['Hotpep']+'|DIAMOND='+reference['DIAMOND']
                 new_brief = brief.replace(id, output_id, 1) + '\n'
                 result.append(new_brief)
 
@@ -53,4 +58,5 @@ def check_result(new_id):
         print(new_id)
 
 if __name__ == '__main__':
-    gff_filter(gff_file='prodigal.gff', overview_file='overview.txt', output_file='filtered_overv.gff')
+    #gff_filter(gff_file='prodigal.gff', overview_file='overview.txt', output_file='filtered_overv.gff')
+    gff_statistic()
